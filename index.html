@@ -10,6 +10,24 @@
     <div id="gameContainer">
 
     </div>
-    <script src="js/game.js"></script>
+    <div id="gameSettings">
+        <form>
+            <div id="playerOneSettings">
+                <p>Player 1</p>
+                <label for="playerOneName">Name:</label>
+                <input type="text" id="playerOneName"/>
+                <label for="playerOneMark">Choose your mark:</label>
+                <input type="text" id="playerOneMark" maxlength="1"/>
+            </div>
+            <div id="playerTwoSettings">
+                <p>Player 2</p>
+                <label for="playerTwoName">Name:</label>
+                <input type="text" id="playerTwoName"/>
+                <label for="playerTwoMark">Choose your mark:</label>
+                <input type="text" id="playerTwoMark" maxlength="1"/>
+            </div>
+            <button type="submit" id="startGame">Start Game</button>
+        </form> 
+    <script defer src="js/game.js"></script>
 </body>
 </html>
