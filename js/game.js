@@ -1,10 +1,14 @@
 const gameSettings = document.querySelector('#gameSettings');
-const playerOneSettings = document.querySelector('#playerOneSettings');
-const playerTwoSettings = document.querySelector('#playerTwoSettings');
-const playerOneMark = document.querySelector('#playerOneMark');
-const playerTwoMark = document.querySelector('#playerTwoMark');
+
+document.body.addEventListener('click', () =>{
+
+})
 
 const game = () =>{
+    const playerOneMark = document.querySelector('#playerOneMark').value;
+    const playerOneName = document.querySelector('#playerOneName').value;
+    const playerTwoMark = document.querySelector('#playerTwoMark').value;
+    const playerTwoName = document.querySelector('#playerTwoName').value;
     const gameSize = 3;
     let players = [];
     let playerOneTurn = true;
@@ -24,25 +28,40 @@ const game = () =>{
         [1,4,8],
         [2,4,6]
     ]
-    let gameStarted = false;
 
-    function initGame(){
-        gameBoard.style = `display:grid;
-                        grid-template: repeat(${gameSize},1fr) / repeat(${gameSize},1fr);
-                        width:800px;
-                        height:800px;
-                        border:1px solid black;`;
+    function playAi(arr){
+        console.log("ai engaged");
+        let aiPlay = Player('O', 'AI');
+        players.push(aiPlay);
+        for(let i=0; i<arr.length; i++){
+            if(arr[i] === null){
+                arr[i] = gameBoard.innerHTML[i] =  aiPlay.mark;
+                console.log(i);
+            }
+        }
+    }
 
-        for(let i=0; i<gameSize*gameSize; i++){
-            gameBoardArr.push(null);
+    function createGrid(gBoard,gBoardArr, gSize){
+        for(let i=0; i<gSize*gSize; i++){
+            gBoardArr.push(null);
             const gameSquare = document.createElement('div');
             gameSquare.setAttribute('class', 'gameSquare');
             gameSquare.dataset.idx = i;
             gameSquare.style = `
                                 background:red;
                                 border: 1px solid black;`;
-            gameBoard.appendChild(gameSquare);
+            gBoard.appendChild(gameSquare);
         }
+    }
+    function initGame(){
+        gameBoard.style = `
+                        display:grid;
+                        grid-template: repeat(${gameSize},1fr) / repeat(${gameSize},1fr);
+                        width:800px;
+                        height:800px;
+                        border:1px solid black;`;
+
+        createGrid(gameBoard,gameBoardArr, gameSize);
         gameContainer.appendChild(gameBoard);
     }
 
@@ -51,8 +70,22 @@ const game = () =>{
         gameOn();
     });
 
-    function gameSettings(){
-        
+    function assignPlayerInfo(){
+        if(playerOneMark == ''){
+            let playerOne = Player('X', playerOneName);
+            players.push(playerOne);
+       }
+       if(playerTwoMark == ''){
+            playAi(gameBoardArr);
+       }
+       else{
+            let playerTwo = Player(playerTwoMark, playerOneName);
+            let playerOne = Player(playerOneMark, playerOneName);
+            players.push(playerOne);
+            players.push(playerTwo);
+       }
+
+       console.log("asisng: " + players.length);
     }
 
     let playSquare = function(e){
@@ -77,68 +110,71 @@ const game = () =>{
 
 
     function gameOn(){
+        gameSettings.style.visibility = 'hidden';
         console.log('game on..');
         reset();
-        let playerOne = Player(playerOneMark.value, '');
-        let playerTwo = Player(playerTwoMark.value, '');
 
-        players.push(playerOne);
-        players.push(playerTwo);
-
-       if(playerOneMark.value == ''){
-           playerOne.mark = 'X';
-       }
-       else if(playerTwoMark.value == ''){
-           playerTwo.mark = 'O';
-       }
-       else{
-           playerOne.mark = playerOneMark.value;
-           playerTwo.mark = playerTwoMark.value;
-       }
+       console.log(players.length);
 
         gameBoard.addEventListener('click', playSquare);
     }
 
     function checkWinner(){
+        //let winScreen = createElement('div');
+        let winner;
+        //HORIZONTAL CHECKING
         for(let i=0; i<gameBoardArr.length; i+=gameSize){
-            if(gameBoardArr[i] != null && gameBoardArr[i] === gameBoardArr[i+1] && gameBoardArr[i+1] === gameBoardArr[i+2]){
-                console.log(gameBoardArr[i] + 'won!');
+            if(gameBoardArr[i] != null && gameBoardArr[i] === winningPositions[i] /*gameBoardArr[i] === gameBoardArr[i+1] && gameBoardArr[i+1] === gameBoardArr[i+2]*/){
+                if(gameBoardArr[i] === players[0].mark){
+                    playerOneName != '' ? console.log(playerOneName + ' wins') : console.log(playerOneMark + ' wins')
+                }
+                else{
+                    playerTwoName != '' ? console.log(playerTwoName + ' wins') : console.log(playerTwoMark + ' wins')
+                };
                 gameBoard.removeEventListener('click', playSquare);
             }
         }
+        //VERTICAL CHECKING
         for(let i=0; i<gameBoardArr.length/gameSize; i++){
             if(gameBoardArr[i] != null && gameBoardArr[i] === gameBoardArr[i+gameSize] && gameBoardArr[i+gameSize] === gameBoardArr[i+(gameSize*2)]){
-                console.log(gameBoardArr[i] + ' won');
+                if(gameBoardArr[i] === players[0].mark){
+                    playerOneName != '' ? console.log(playerOneName + ' wins') : console.log(playerOneMark + ' wins')
+                }
+                else{
+                    playerTwoName != '' ? console.log(playerTwoName + ' wins') : console.log(playerTwoMark + ' wins')
+                };
+                gameBoard.removeEventListener('click', playSquare);
             }
         }
-
-        for(let i=0; i<=3; i+=2){
-
-            if(gameBoardArr[i] != null && gameBoardArr[i] === gameBoardArr[i+gameSize+1] && gameBoardArr[i+gameSize+1] === gameBoardArr[i+(gameSize*gameSize)-1] ||
-               gameBoardArr[i] != null && gameBoardArr[i] === gameBoardArr[i+(gameSize-1)] && gameBoardArr[i+(gameSize-1)] === gameBoardArr[i+(gameSize+1)]){
-                   console.log("lapanen");
+        //DIAGONAL CHECKING
+        for(let i=0; i<=gameSize; i+=gameSize-1){
+            if(gameBoardArr[i] != null && gameBoardArr[i] === gameBoardArr[i+gameSize+1] && gameBoardArr[i+gameSize+1] === gameBoardArr[i+(gameSize*gameSize)-1] || 
+            gameBoardArr[i] != null && gameBoardArr[i] === gameBoardArr[i+(gameSize-1)] && gameBoardArr[i+(gameSize-1)] === gameBoardArr[i+(gameSize+1)]){
+                if(gameBoardArr[i] === players[0].mark){
+                    playerOneName != '' ? console.log(playerOneName + ' wins') : console.log(playerOneMark + ' wins')
+                }
+                else{
+                    playerTwoName != '' ? console.log(playerTwoName + ' wins') : console.log(playerTwoMark + ' wins')
+                };
+                gameBoard.removeEventListener('click', playSquare);
                }
         }
     }
 
     function reset(){
         console.log('reset');
-
-        for(let i=0; i<gameBoardArr.length; i++){
-
-            gameBoardArr[i] = null;
-
-        }
-        console.log(gameBoardArr);
+        players = [];
+        assignPlayerInfo();
+        playerOneTurn=true;
+        gameBoard.innerHTML = '';
+        gameBoardArr = [];
+        createGrid(gameBoard, gameBoardArr, gameSize);
     }
 
     initGame();
-
-
 }
 
 const Player = (mark, name) =>{
-
     return {mark, name}
 }
 

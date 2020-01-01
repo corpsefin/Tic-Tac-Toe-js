@@ -1,0 +1,9 @@
+html, body{
+    display: flex;
+    flex-direction: row;
+}
+
+#gameSettings{
+    margin: 0 50px;
+    width: 200px;
+}
